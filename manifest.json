@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/chrome-manifest",
+  "manifest_version": 3,
+  "name": "Misie",
+  "description": "Uwaga! Misie patrzą",
+  "version": "0.0.1",
+  "version_name": "Alfa 0.0.1",
+  "author": "KM",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "js/content.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "storage"
+  ],
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "action": {
+    "default_title": "Uwaga! Misie patrzą",
+    "default_popup": "popup/index.html"
+  },
+  "icons": {
+    "128": "img/icon.png"
+  }
+}
