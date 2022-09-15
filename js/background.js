@@ -7,6 +7,7 @@ const defaultPages = [
   'https://spotify.com',
   'https://music.youtube.com/',
   'https://giphy.com',
+  'https://tenor.com',
   'https://streamable.com',
   'https://www.youtube.com',
   'https://drive.google.com',
