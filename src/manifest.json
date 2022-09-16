@@ -4,7 +4,7 @@
   "name": "Misie",
   "description": "Uwaga! Misie patrzą",
   "version": "0.0.1",
-  "version_name": "Alfa 0.0.1",
+  "version_name": "Beta 0.0.2",
   "author": "KM",
   "content_scripts": [
     {
