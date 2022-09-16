@@ -1,15 +1,16 @@
 const defaultPages = [
-  'https://www.facebook.com',
+  'https://facebook.com',
   'https://edge-chat.facebook.com',
   'https://scontent-waw1-1.xx.fbcdn.net',
   'https://twitter.com',
+  'https://pic.twitter.com',
   'https://abs.twimg.com',
   'https://spotify.com',
   'https://music.youtube.com/',
   'https://giphy.com',
   'https://tenor.com',
   'https://streamable.com',
-  'https://www.youtube.com',
+  'https://youtube.com',
   'https://drive.google.com',
   'https://docs.google.com',
 ]
@@ -106,7 +107,7 @@ async function UnlockAll() {
 
 
 async function main() {
-  console.log("Misie background")
+  console.log("Misie background", new Date())
 
   chrome.runtime.onMessage.addListener(
     (message, sender, sendResponse) => {

@@ -9,3 +9,5 @@ async function main() {
 }
 
 main().then().catch(console.error)
+
+chrome.runtime.sendMessage({ request: "init:page", data: null })
