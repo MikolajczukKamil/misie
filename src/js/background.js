@@ -1,18 +1,31 @@
 const defaultPages = [
+  // FB
   'https://facebook.com',
   'https://edge-chat.facebook.com',
   'https://scontent-waw1-1.xx.fbcdn.net',
+
+  // TT
   'https://twitter.com',
   'https://pic.twitter.com',
   'https://abs.twimg.com',
+
+  // Muzyka
   'https://spotify.com',
-  'https://music.youtube.com/',
-  'https://giphy.com',
-  'https://tenor.com',
-  'https://streamable.com',
-  'https://youtube.com',
+  'https://tidal.com',
+  'https://music.youtube.com',
+
+  // Google
   'https://drive.google.com',
   'https://docs.google.com',
+  'https://keep.google.com',
+
+  // Gify
+  'https://giphy.com',
+  'https://tenor.com',
+
+  // Video
+  'https://youtube.com',
+  'https://streamable.com',
 ]
 
 async function Unlock(url) {

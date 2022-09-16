@@ -40,7 +40,7 @@ body {
 }
 
 .logo {
-  width: 200px;
+  width: 150px;
   margin: 10px auto 0;
 }
 
@@ -63,6 +63,12 @@ button {
   border-radius: 0.25rem;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+button[disabled] {
+  color: #111;
+  border-color: #aaa;
+  background-color: #aaa;
 }
 
 #clean-btn {
@@ -91,4 +97,9 @@ button {
   margin-bottom: 8px;
   padding: 0px 8px;
   font-size: 0.8em;
+}
+
+#pages-list {
+  max-height: 300px;
+  overflow: auto;
 }
