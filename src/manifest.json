@@ -3,9 +3,8 @@
   "manifest_version": 3,
   "name": "Misie",
   "description": "Uwaga! Misie patrzą",
-  "version": "0.0.1",
-  "version_name": "Beta 0.0.3",
-  "author": "KM",
+  "version": "1.0.0",
+  "author": "Kamil Mikołajczuk",
   "content_scripts": [
     {
       "matches": [
@@ -23,7 +22,7 @@
     "service_worker": "js/background.js"
   },
   "action": {
-    "default_title": "Uwaga! Misie patrzą",
+    "default_title": "Misie",
     "default_popup": "popup/index.html"
   },
   "icons": {

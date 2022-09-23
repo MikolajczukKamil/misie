@@ -1,71 +1,117 @@
-console.log("Misie popup", document)
+console.log('Misie 1.0.0 popup', new Date())
 
-function startAction() {
-  chrome.runtime.sendMessage({ request: "start", data: {} })
+/**
+ * @param request {string}
+ * @param data {any}
+ * @return {Promise<any>}
+ */
+const sendMessage = (request, data = null) => chrome.runtime.sendMessage({ request, data })
+
+/**
+ * @param selector {string}
+ * @return {HTMLElement}
+ */
+const $ = (selector) => document.querySelector(selector)
+
+const State = {
+  init: 'init',
+  working: 'working',
+  done: 'done',
 }
 
-async function getPages() {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ request: "get:pages", data: {} }, resolve)
-  })
-}
-
-async function resetList() {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ request: "reset:pages", data: {} }, resolve)
-  })
-}
-
-async function addPage(page) {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ request: "add:page", data: page }, resolve)
-  })
+const Actions = {
+  start: 'start',
+  addPage: 'add:page',
+  deletePage: 'delete:page',
+  getPages: 'get:pages',
+  resetFull: 'reset:full',
+  resetDefaults: 'reset:defaults',
+  resetUserDeletes: 'reset:user',
+  propagateChange: 'propagate:change',
+  stateChanged: 'state:change',
 }
 
 async function showPages() {
-  const list = document.querySelector("#pages-list")
+  const list = $('#pages-list')
+
+  const scrollTop = list.scrollTop
 
   Array.from(list.children).forEach(element => list.removeChild(element))
 
-  for (const page of await getPages()) {
-    const li = document.createElement('li')
-    li.textContent = page
+  const pages = await sendMessage(Actions.getPages)
 
+  for (const page of pages) {
+    const deleteBtn = document.createElement('button')
+    deleteBtn.classList.add('small', 'secondary')
+    deleteBtn.addEventListener('click', () => {
+      sendMessage(Actions.deletePage, page).then(() => showPages()).then()
+    })
+    deleteBtn.innerText = 'X'
+    deleteBtn.title = 'Usuń'
+
+    const li = document.createElement('li')
+    li.appendChild(deleteBtn)
+    li.append(' ', page)
     list.appendChild(li);
   }
+
+  list.scroll({ top: scrollTop })
 }
 
 async function main() {
-  chrome.runtime.onMessage.addListener(
-    (message) => {
-      try {
-        if (message.request === 'state:change') {
-          document.querySelector('#clean-btn').disabled = message.data === 'working'
-        }
-      } catch (e) {
-        console.error(e)
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    try {
+      if (message.request === Actions.stateChanged) {
+        const working = message.data === State.working
+
+        $('#clean-btn').disabled = working
+        $('#clean-on').style.display = working ? '' : 'none'
+        $('#clean-off').style.display = working ? 'none' : ''
+
+        return sendResponse(null)
       }
+    } catch (e) {
+      console.error(e)
     }
-  );
 
-  document.querySelector('#clean-btn').addEventListener('click', startAction)
+    return sendResponse(null)
+  });
 
-  document.querySelector("#add-btn").addEventListener('click', () => {
-    const input = document.querySelector("#add-input")
+  $('#add-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      $('#add-btn').click()
+    }
+  });
 
-    addPage(input.value).then(() => {
-      input.value = ''
-
-      return showPages()
-    }).then()
+  $('#clean-btn').addEventListener('click', () => {
+    sendMessage(Actions.start).then()
   })
 
-  document.querySelector("#reset").addEventListener('click', () => {
-    resetList().then(showPages).then()
+  $('#add-btn').addEventListener('click', () => {
+    const input = $('#add-input')
+    const value = input.value
+
+    input.value = ''
+
+    sendMessage(Actions.addPage, value).then(() => showPages()).then()
   })
+
+  $('#reset').addEventListener('click', () => {
+    sendMessage(Actions.resetFull).then(showPages).then()
+  })
+
+  $('#reset-defaults').addEventListener('click', () => {
+    sendMessage(Actions.resetDefaults).then(showPages).then()
+  })
+
+  $('#reset-user').addEventListener('click', () => {
+    sendMessage(Actions.resetUserDeletes).then(showPages).then()
+  })
+
+  await sendMessage(Actions.propagateChange)
 
   await showPages()
 }
-
 
 main().then().catch(console.error)

@@ -1,0 +1,22 @@
+{
+  "name": "misie",
+  "version": "1.0.0",
+  "description": "Rozszerzenie do przeglądarki",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/chrome": "0.0.197"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikolajczukKamil/misie.git"
+  },
+  "keywords": [],
+  "author": "Kamil Mikołajczuk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MikolajczukKamil/misie/issues"
+  },
+  "homepage": "https://github.com/MikolajczukKamil/misie#readme"
+}
