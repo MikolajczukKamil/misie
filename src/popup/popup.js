@@ -12,7 +12,19 @@ async function getPages() {
 
 async function resetList() {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ request: "reset:pages", data: {} }, resolve)
+    chrome.runtime.sendMessage({ request: "reset:full", data: {} }, resolve)
+  })
+}
+
+async function resetDefaultsList() {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ request: "reset:defaults", data: {} }, resolve)
+  })
+}
+
+async function resetUserPagesList() {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ request: "reset:user", data: {} }, resolve)
   })
 }
 
@@ -22,17 +34,38 @@ async function addPage(page) {
   })
 }
 
+async function deletePage(page) {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ request: "delete:page", data: page }, resolve)
+  })
+}
+
 async function showPages() {
   const list = document.querySelector("#pages-list")
 
+  const scrollTop = list.scrollTop
+
   Array.from(list.children).forEach(element => list.removeChild(element))
 
-  for (const page of await getPages()) {
+  const pages = await getPages()
+
+  for (const page of pages) {
     const li = document.createElement('li')
-    li.textContent = page
+    const deleteBtn = document.createElement('button')
+    deleteBtn.classList.add("small", "secondary")
+    deleteBtn.addEventListener('click', () => {
+      deletePage(page).then(() => showPages()).then()
+    })
+    deleteBtn.innerText = 'X'
+    deleteBtn.title = 'Usuń'
+    li.appendChild(deleteBtn)
+
+    li.append(" ", page)
 
     list.appendChild(li);
   }
+
+  list.scroll({ top: scrollTop })
 }
 
 async function main() {
@@ -40,7 +73,10 @@ async function main() {
     (message) => {
       try {
         if (message.request === 'state:change') {
-          document.querySelector('#clean-btn').disabled = message.data === 'working'
+          const working = message.data === 'working'
+          document.querySelector('#clean-btn').disabled = working
+          document.querySelector('#clean-on').style.display = working ? '' : 'none'
+          document.querySelector('#clean-off').style.display = working ? 'none' : ''
         }
       } catch (e) {
         console.error(e)
@@ -48,7 +84,16 @@ async function main() {
     }
   );
 
+  chrome.runtime.sendMessage({ request: "propagate:change", data: {} })
+
   document.querySelector('#clean-btn').addEventListener('click', startAction)
+
+  document.querySelector("#add-input").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      document.querySelector("#add-btn").click()
+    }
+  });
 
   document.querySelector("#add-btn").addEventListener('click', () => {
     const input = document.querySelector("#add-input")
@@ -62,6 +107,14 @@ async function main() {
 
   document.querySelector("#reset").addEventListener('click', () => {
     resetList().then(showPages).then()
+  })
+
+  document.querySelector("#reset-defaults").addEventListener('click', () => {
+    resetDefaultsList().then(showPages).then()
+  })
+
+  document.querySelector("#reset-user").addEventListener('click', () => {
+    resetUserPagesList().then(showPages).then()
   })
 
   await showPages()

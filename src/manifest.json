@@ -3,7 +3,7 @@
   "manifest_version": 3,
   "name": "Misie",
   "description": "Uwaga! Misie patrzą",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "version_name": "Beta 0.0.3",
   "author": "KM",
   "content_scripts": [

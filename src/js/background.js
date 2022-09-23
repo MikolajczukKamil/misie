@@ -26,6 +26,9 @@ const defaultPages = [
   // Video
   'https://youtube.com',
   'https://streamable.com',
+
+  // Instagram
+  'https://instagram.com',
 ]
 
 async function Unlock(url) {
@@ -70,21 +73,53 @@ async function Unlock(url) {
 }
 
 let userAddedPages = []
+let userDeletedPages = []
+
+async function save() {
+  await chrome.storage?.sync.set({ userAddedPages, userDeletedPages })
+}
 
 async function addPage(page) {
   userAddedPages.push(page)
+  userDeletedPages = userDeletedPages.filter(url => url !== page)
 
-  await chrome.storage?.sync.set({ userAddedPages })
+  await save()
+}
+
+async function addDefaults() {
+  userDeletedPages = userDeletedPages.filter(url => !defaultPages.includes(url))
+
+  await save()
+}
+
+async function deletePage(page) {
+  userDeletedPages.push(page)
+  userAddedPages = userAddedPages.filter(url => url !== page)
+
+  await save()
+}
+
+async function deleteUserPages() {
+  userAddedPages = []
+
+  await save()
 }
 
 async function resetPages() {
   userAddedPages = []
+  userDeletedPages = []
 
-  await chrome.storage?.sync.set({ userAddedPages })
+  await save()
 }
 
 function getAllPages() {
-  return [...defaultPages, ...userAddedPages]
+  return Array.from(
+    new Set(
+      [...defaultPages, ...userAddedPages]
+        .filter(url => !userDeletedPages.includes(url))
+        .map(url => url.trim())
+    )
+  )
 }
 
 let state = 'init'
@@ -120,7 +155,7 @@ async function UnlockAll() {
 
 
 async function main() {
-  console.log("Misie background", new Date())
+  console.log("Misie 0.0.3", new Date())
 
   chrome.runtime.onMessage.addListener(
     (message, sender, sendResponse) => {
@@ -139,8 +174,33 @@ async function main() {
           return sendResponse(getAllPages())
         }
 
-        if (message.request === 'reset:pages') {
-          resetPages().then()
+        if (message.request === 'reset:defaults') {
+          addDefaults()
+            .then(() => UnlockAll())
+            .then()
+
+          return sendResponse(getAllPages())
+        }
+
+        if (message.request === 'delete:page') {
+          deletePage(message.data)
+            .then()
+
+          return sendResponse(getAllPages())
+        }
+
+        if (message.request === 'reset:user') {
+          deleteUserPages(message.data)
+            .then()
+
+          return sendResponse(getAllPages())
+        }
+
+
+        if (message.request === 'reset:full') {
+          resetPages()
+            .then(() => UnlockAll())
+            .then()
 
           return sendResponse(getAllPages())
         }
@@ -150,6 +210,12 @@ async function main() {
         }
 
         if (message.request === 'get:state') {
+          return sendResponse(state)
+        }
+
+        if (message.request === 'propagate:change') {
+          setState(state)
+
           return sendResponse(state)
         }
 

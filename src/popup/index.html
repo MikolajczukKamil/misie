@@ -10,20 +10,64 @@
   </head>
   <body>
     <div class="container">
-      <img src="/img/misie.png" alt="" class="logo" />
+      <img
+        src="/img/misie.png"
+        alt=""
+        class="logo"
+        title="Z miłości do internetu &#10084;"
+      />
+
+      <div>
+        <button
+          id="clean-btn"
+          title="Czyszczenie powinno dziać się automatycznie, manualne uruchomienie nie powinno być potrzebne"
+        >
+          Uruchom pełne czyszczenie
+        </button>
+
+        <p id="clean-on">Czyszczenie trwa</p>
+        <p id="clean-off" style="display: none">
+          Czyszczenie zakończone &#128517;
+        </p>
+      </div>
     </div>
 
-    <button id="clean-btn">Uruchom pełne czyszczenie</button>
-
-    <ul id="pages-list">
+    <ol id="pages-list">
       <li>Ładowanie ...</li>
-    </ul>
+    </ol>
 
-    <button id="reset">Reset listy</button>
+    <button
+      id="reset"
+      class="small secondary"
+      title="Usuwa wszystkie dodane przez użytkownika strony oraz dodaje domyślne które zostały usunięte"
+    >
+      Pełny reset
+    </button>
+
+    <button
+      id="reset-defaults"
+      class="small secondary"
+      title="Dodaje usunięte strony z pakietu domyślnego, nie usuwa dodanych przez użytkownika"
+    >
+      Przywróć domyślne
+    </button>
+
+    <button
+      id="reset-user"
+      class="small secondary"
+      title="Usuwa wcześniej dodane strony"
+    >
+      Usuń dodane
+    </button>
 
     <div id="add">
       <input id="add-input" placeholder="https://facebook.com" type="text" />
-      <button id="add-btn">Dodaj</button>
+      <button
+        id="add-btn"
+        title="Dodaj wpisaną obok stronę na listę sprawdzanych"
+      >
+        Dodaj
+      </button>
     </div>
 
     <script src="popup.js"></script>

@@ -35,7 +35,6 @@ body {
   width: 500px;
 
   display: flex;
-  flex-direction: column;
   padding: 8px;
 }
 
@@ -71,6 +70,18 @@ button[disabled] {
   background-color: #aaa;
 }
 
+button.small {
+  margin: 4px;
+  padding: 0px 8px;
+  font-size: 0.8em;
+}
+
+button.secondary {
+  color: #212529;
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+}
+
 #clean-btn {
   min-width: 50%;
   margin: auto;
@@ -90,16 +101,7 @@ button[disabled] {
   border-bottom: 1px solid black;
 }
 
-#reset {
-  color: #212529;
-  background-color: #e2e6ea;
-  border-color: #dae0e5;
-  margin-bottom: 8px;
-  padding: 0px 8px;
-  font-size: 0.8em;
-}
-
 #pages-list {
-  max-height: 300px;
+  height: 300px;
   overflow: auto;
 }
