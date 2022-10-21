@@ -1,11 +1,17 @@
-console.log('Misie 1.0.0 popup', new Date())
+const isChrome = !!chrome.runtime.sendMessage({ request: 'test:sendMessage', data: null })
+
+console.log('Misie 1.0.1 popup', { time: new Date(), isChrome })
+
 
 /**
  * @param request {string}
  * @param data {any}
  * @return {Promise<any>}
  */
-const sendMessage = (request, data = null) => chrome.runtime.sendMessage({ request, data })
+const sendMessage = (request, data = null) =>
+    isChrome ?
+        chrome.runtime.sendMessage({ request, data }) :
+        browser.runtime.getBackgroundPage().then(bg => bg.handleRequest(request, data))
 
 /**
  * @param selector {string}

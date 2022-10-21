@@ -1,4 +1,4 @@
-console.log('Misie 1.0.0 background', new Date())
+console.log('Misie 1.0.1 background', { time: new Date() })
 
 const defaultPages = [
   // FB
@@ -58,15 +58,15 @@ let userDeletedPages = []
 function setState(value) {
   state = value
 
-  console.info("State", state, new Date())
+  console.info('State', state, new Date())
 
-  chrome.runtime.sendMessage({ request: Actions.stateChanged, data: state }).catch(() => null).then()
+  chrome.runtime.sendMessage({ request: Actions.stateChanged, data: state })?.catch(() => null).then()
 }
 
 async function Unlock(url) {
   console.log('Unlock: Start', url)
 
-  const res = await fetch(url)
+  const res = await fetch(url, { mode: 'no-cors' })
 
   if (!res.url.includes('urlblock')) {
     console.log('Unlock: URL ok', url, '->', res.url)
@@ -91,7 +91,7 @@ async function Unlock(url) {
         referrerPolicy: 'strict-origin-when-cross-origin',
         body: 'ok=Continue',
         method: 'POST',
-        mode: 'cors',
+        mode: 'no-cors',
         credentials: 'include'
       });
 
@@ -164,7 +164,7 @@ async function UnlockAll() {
       pages.map(
           page => Unlock(page)
               .catch((e) => {
-                console.error("Request", e)
+                console.error('Request', e)
 
                 return false
               })
@@ -174,71 +174,84 @@ async function UnlockAll() {
   setState(State.done)
 }
 
+/**
+ * @param request {string} Zdarzenie
+ * @param data {any} Dane
+ * @return {any}
+ */
+function handleRequest(request, data = null) {
+  console.log('handleRequest', request, data)
+
+  if (request === Actions.start) {
+     UnlockAll()
+         .then()
+
+    return null
+  }
+
+  if (request === Actions.addPage) {
+    addPage(data)
+        .then(() => setState(State.working))
+        .then(() => Unlock(data))
+        .then(() => setState(State.done))
+        .then()
+
+    return getAllPages()
+  }
+
+  if (request === Actions.resetDefaults) {
+    addDefaults()
+        .then(() => UnlockAll())
+        .then()
+
+    return getAllPages()
+  }
+
+  if (request === Actions.deletePage) {
+    deletePage(data)
+        .then()
+
+    return getAllPages()
+  }
+
+  if (request === Actions.resetUserDeletes) {
+    deleteUserPages().then()
+
+    return getAllPages()
+  }
+
+
+  if (request === Actions.resetFull) {
+    resetPages()
+        .then(() => UnlockAll())
+        .then()
+
+    return getAllPages()
+  }
+
+  if (request === Actions.getPages) {
+    return getAllPages()
+  }
+
+  if (request === Actions.propagateChange) {
+    setState(state)
+
+    return state
+  }
+
+  return null
+}
+
 
 async function main() {
   chrome.runtime.onMessage.addListener(
       (message, _sender, sendResponse) => {
-        console.log('Message', message)
+        console.log('onMessage', message)
 
         try {
-          if (message.request === Actions.start) {
-            return UnlockAll().then(sendResponse)
-          }
-
-          if (message.request === Actions.addPage) {
-            addPage(message.data)
-                .then(() => setState(State.working))
-                .then(() => Unlock(message.data))
-                .then(() => setState(State.done))
-                .then()
-
-            return sendResponse(getAllPages())
-          }
-
-          if (message.request === Actions.resetDefaults) {
-            addDefaults()
-                .then(() => UnlockAll())
-                .then()
-
-            return sendResponse(getAllPages())
-          }
-
-          if (message.request === Actions.deletePage) {
-            deletePage(message.data)
-                .then()
-
-            return sendResponse(getAllPages())
-          }
-
-          if (message.request === Actions.resetUserDeletes) {
-            deleteUserPages()
-                .then()
-
-            return sendResponse(getAllPages())
-          }
-
-
-          if (message.request === Actions.resetFull) {
-            resetPages()
-                .then(() => UnlockAll())
-                .then()
-
-            return sendResponse(getAllPages())
-          }
-
-          if (message.request === Actions.getPages) {
-            return sendResponse(getAllPages())
-          }
-
-          if (message.request === Actions.propagateChange) {
-            setState(state)
-
-            return sendResponse(state)
-          }
-
-          return sendResponse(null)
+          return sendResponse(handleRequest(message.request, message.data))
         } catch (e) {
-          console.error("Przetwarzanie wiadomości", e)
+          console.error('onMessage', e)
         }
       }
   );
